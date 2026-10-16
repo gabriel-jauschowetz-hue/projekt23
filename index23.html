@@ -232,6 +232,29 @@ html.il h1,html.il #utime{opacity:0}
 html.ix nav a,html.ix #cbtn,html.ix #rad{opacity:0}
 nav a,#cbtn,#rad{pointer-events:none}
 html.rdy nav a,html.rdy #cbtn,html.rdy #rad{pointer-events:auto}
+
+.gbOpenBtn{position:absolute;right:10px;bottom:8px;font-family:"PixelOperator8Bold","Courier New",monospace;font-size:11px;line-height:1;color:#ff8c1a;background:transparent;border:1px solid #ff8c1a;padding:6px 8px;cursor:pointer;pointer-events:auto}
+#gb{position:fixed;left:0;top:0;width:100%;height:100%;z-index:9000;background:rgba(12,12,14,.94);display:none;flex-direction:column;font-family:"PixelOperator8","Courier New",monospace;color:#e8e8ee;opacity:0;transition:opacity .4s ease}
+#gb.on{display:flex;opacity:1}
+#gb .gbTop{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #3c3c44}
+#gb .gbTop b{font-family:"PixelOperator8Bold","Courier New",monospace;font-weight:400;font-size:16px;color:#fff}
+#gb .gbBtn{font-family:"PixelOperator8Bold","Courier New",monospace;font-size:13px;line-height:1;color:#ff8c1a;background:transparent;border:1px solid #ff8c1a;padding:10px 12px;cursor:pointer}
+#gb .gbBtn:disabled{opacity:.5}
+#gb .gbListView{display:flex;flex-direction:column;flex:1;min-height:0}
+#gb .gbNew{align-self:center;margin:14px 0;font-size:16px;padding:12px 18px}
+#gb .gbList{flex:1;overflow-y:auto;padding:0 16px 24px;-webkit-overflow-scrolling:touch}
+#gb .gbE{border:1px solid #3c3c44;padding:10px 12px;margin-bottom:10px;background:rgba(255,255,255,.02)}
+#gb .gbE .d{font-size:9px;color:#6e6e76;margin-bottom:6px}
+#gb .gbE .h{font-family:"PixelOperator8Bold","Courier New",monospace;font-size:15px;color:#fff;margin-bottom:6px;overflow-wrap:anywhere}
+#gb .gbE .x{font-size:12px;line-height:1.45;color:#c8c8d0;white-space:pre-wrap;overflow-wrap:anywhere}
+#gb .gbForm{padding:16px;display:flex;flex-direction:column;gap:10px}
+#gb .gbForm[hidden]{display:none}
+#gb input,#gb textarea{font-family:"PixelOperator8","Courier New",monospace;font-size:14px;color:#fff;background:#16161a;border:1px solid #3c3c44;padding:10px;box-sizing:border-box;width:100%;outline:none;border-radius:0}
+#gb textarea{min-height:150px;resize:vertical}
+#gb .gbCount{font-size:9px;color:#6e6e76;text-align:right}
+#gb .gbMsg{font-size:10px;color:#ff8c1a;min-height:14px}
+#gb .gbRow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#gb .gbEmpty{color:#6e6e76;padding:10px 0;font-size:11px}
 </style>
 </head>
 <body>
@@ -247,7 +270,7 @@ html.rdy nav a,html.rdy #cbtn,html.rdy #rad{pointer-events:auto}
   <div id="news"></div>
   <div id="imp" hidden><div class="nw vis imp-box"><div class="tt">Herzlich willkommen auf projekt23</div><div class="tx">Webseite erstellt von Gabriel Jauschowetz
 
-Kontakt: <a href="mailto:gabriel-jauschowetz@web.de" style="pointer-events:auto;display:inline-block;padding:4px 0">gabriel-jauschowetz@web.de</a></div></div></div>
+Kontakt: <a href="mailto:gabriel-jauschowetz@web.de" style="pointer-events:auto;display:inline-block;padding:4px 0">gabriel-jauschowetz@web.de</a></div><button type="button" class="gbOpenBtn" id="gbOpen">gästebuch</button></div></div>
   <div id="games" hidden></div>
   <div id="gallery" hidden></div>
 </div>
@@ -825,6 +848,8 @@ var NEWS=[
 {d:"2026-10-15 02:10",t:"Neue Version v337",by:"c",x:"Beim Drücken aufs Logo fliegen die Blätter von der Schrift weg, kommen erst näher und werden beim Fallen wieder kleiner."},
 {d:"2026-10-15 02:13",t:"Neue Version v338",by:"c",x:"Blätter wirken räumlicher: Wegwehende Blätter kommen näher und werden größer, dann fallen sie zurück und werden kleiner. Alle Blätter kippen dreidimensional."},
 {d:"2026-10-15 02:17",t:"Neue Version v339",by:"c",x:"Herbst ist jetzt ein eigener Schalter: läuft als Extra-Animation über jedem Hintergrund, mit Anzeige on (grün) und off (rot)."},
+{d:"2026-10-17 00:54",t:"Neue Version v433",by:"c",x:"Gästebuch ist mit dem Webspace verbunden. Einträge werden dort gespeichert und für alle angezeigt."},
+{d:"2026-10-17 00:40",t:"Neue Version v432",by:"c",x:"Impressum: Neuer Button gästebuch. Im Gästebuch stehen Einträge mit Überschrift und Text, der neueste zuerst."},
 {d:"2026-10-15 08:46",t:"Neue Version v431",by:"c",x:"Startbildschirm: Symbol wird über eine Manifest-Datei mit Logo geladen. Dafür liegen manifest.json und die Logo-Bilder im selben Ordner."},
 {d:"2026-10-15 08:38",t:"Neue Version v430",by:"c",x:"Startbildschirm: Das Symbol ist jetzt das projekt23-Logo auf dunklem Grund."},
 {d:"2026-10-15 08:27",t:"Neue Version v429",by:"c",x:"Startbildschirm: Die Verknüpfung zeigt jetzt das projekt23-Logo statt des Buchstabens G."},
@@ -1770,6 +1795,71 @@ var NEWS=[
     if(t.classList&&t.classList.contains("gm")&&t._g&&t._g.state!=="ready"&&t._g.state!=="idle")return;
     try{var a=new Audio(SRC);a.volume=0.3;a.playbackRate=1.25;var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});}catch(x){ok=false;}
   },{passive:true});
+})();
+</script>
+<div id="gb" aria-hidden="true">
+<div class="gbTop"><b>gästebuch</b><button type="button" class="gbBtn" id="gbBack">zurück</button></div>
+<div class="gbListView" id="gbListView">
+<button type="button" class="gbBtn gbNew" id="gbNewBtn">Eintrag hinterlassen</button>
+<div class="gbList" id="gbList"></div>
+</div>
+<div class="gbForm" id="gbFormView" hidden>
+<input id="gbTitel" maxlength="60" placeholder="überschrift" autocomplete="off">
+<textarea id="gbText" maxlength="155" placeholder="dein text"></textarea>
+<div class="gbCount" id="gbCount">0/155</div>
+<div class="gbMsg" id="gbMsg"></div>
+<div class="gbRow"><button type="button" class="gbBtn" id="gbSend">abschicken</button><button type="button" class="gbBtn" id="gbCancel">abbrechen</button></div>
+</div>
+</div>
+<script>
+/* Gästebuch: spricht mit guestbook.php auf deinem Webspace */
+(function(){
+  var GB_URL="https://projekt2e.xo.je/guestbook.php";
+  var ov=document.getElementById("gb"),lv=document.getElementById("gbListView"),fv=document.getElementById("gbFormView"),list=document.getElementById("gbList"),msg=document.getElementById("gbMsg");
+  var tI=document.getElementById("gbTitel"),xI=document.getElementById("gbText"),cnt=document.getElementById("gbCount"),send=document.getElementById("gbSend");
+  function ok(){return GB_URL.indexOf("DEINE-DOMAIN")<0;}
+  function p2(n){return (n<10?"0":"")+n;}
+  function fmt(t){var d=new Date(t*1000);return p2(d.getDate())+"."+p2(d.getMonth()+1)+"."+d.getFullYear()+" "+p2(d.getHours())+":"+p2(d.getMinutes());}
+  function empty(txt){list.textContent="";var e=document.createElement("div");e.className="gbEmpty";e.textContent=txt;list.appendChild(e);}
+  function render(items){
+    list.textContent="";
+    if(!items.length){empty("noch keine einträge");return;}
+    items.forEach(function(it){
+      var box=document.createElement("div");box.className="gbE";
+      var d=document.createElement("div");d.className="d";d.textContent=fmt(it.t);
+      var h=document.createElement("div");h.className="h";h.textContent=it.titel;
+      var x=document.createElement("div");x.className="x";x.textContent=it.text;
+      box.appendChild(d);box.appendChild(h);box.appendChild(x);list.appendChild(box);
+    });
+  }
+  function load(){
+    if(!ok()){empty("gästebuch ist noch nicht eingerichtet");return;}
+    empty("lädt …");
+    fetch(GB_URL,{cache:"no-store"}).then(function(r){return r.json();}).then(render).catch(function(){empty("einträge konnten nicht geladen werden");});
+  }
+  function view(v){lv.style.display=v==="list"?"flex":"none";fv.hidden=v!=="form";msg.textContent="";}
+  function open(){ov.classList.add("on");ov.setAttribute("aria-hidden","false");view("list");load();}
+  function close(){ov.classList.remove("on");ov.setAttribute("aria-hidden","true");}
+  document.getElementById("gbOpen").addEventListener("click",open);
+  document.getElementById("gbBack").addEventListener("click",close);
+  document.getElementById("gbNewBtn").addEventListener("click",function(){view("form");tI.focus();});
+  document.getElementById("gbCancel").addEventListener("click",function(){view("list");});
+  xI.addEventListener("input",function(){cnt.textContent=xI.value.length+"/155";});
+  send.addEventListener("click",function(){
+    var t=tI.value.trim(),x=xI.value.trim();
+    if(!t||!x){msg.textContent="bitte überschrift und text ausfüllen";return;}
+    if(!ok()){msg.textContent="gästebuch ist noch nicht eingerichtet";return;}
+    send.disabled=true;msg.textContent="speichere …";
+    fetch(GB_URL,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({titel:t,text:x})})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+      .then(function(res){
+        if(!res.ok){msg.textContent=res.j.fehler||"speichern fehlgeschlagen";return;}
+        tI.value="";xI.value="";cnt.textContent="0/155";
+        view("list");load();
+      })
+      .catch(function(){msg.textContent="senden fehlgeschlagen";})
+      .then(function(){send.disabled=false;});
+  });
 })();
 </script>
 </body>
