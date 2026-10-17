@@ -848,6 +848,7 @@ var NEWS=[
 {d:"2026-10-15 02:10",t:"Neue Version v337",by:"c",x:"Beim Drücken aufs Logo fliegen die Blätter von der Schrift weg, kommen erst näher und werden beim Fallen wieder kleiner."},
 {d:"2026-10-15 02:13",t:"Neue Version v338",by:"c",x:"Blätter wirken räumlicher: Wegwehende Blätter kommen näher und werden größer, dann fallen sie zurück und werden kleiner. Alle Blätter kippen dreidimensional."},
 {d:"2026-10-15 02:17",t:"Neue Version v339",by:"c",x:"Herbst ist jetzt ein eigener Schalter: läuft als Extra-Animation über jedem Hintergrund, mit Anzeige on (grün) und off (rot)."},
+{d:"2026-10-18 00:30",t:"Neue Version v434",by:"c",x:"Gästebuch läuft jetzt über den neuen Webspace gabrielj.bplaced.net."},
 {d:"2026-10-17 00:54",t:"Neue Version v433",by:"c",x:"Gästebuch ist mit dem Webspace verbunden. Einträge werden dort gespeichert und für alle angezeigt."},
 {d:"2026-10-17 00:40",t:"Neue Version v432",by:"c",x:"Impressum: Neuer Button gästebuch. Im Gästebuch stehen Einträge mit Überschrift und Text, der neueste zuerst."},
 {d:"2026-10-15 08:46",t:"Neue Version v431",by:"c",x:"Startbildschirm: Symbol wird über eine Manifest-Datei mit Logo geladen. Dafür liegen manifest.json und die Logo-Bilder im selben Ordner."},
@@ -1814,7 +1815,7 @@ var NEWS=[
 <script>
 /* Gästebuch: spricht mit guestbook.php auf deinem Webspace */
 (function(){
-  var GB_URL="https://projekt2e.xo.je/guestbook.php";
+  var GB_URL="https://gabrielj.bplaced.net/guestbook.php";
   var ov=document.getElementById("gb"),lv=document.getElementById("gbListView"),fv=document.getElementById("gbFormView"),list=document.getElementById("gbList"),msg=document.getElementById("gbMsg");
   var tI=document.getElementById("gbTitel"),xI=document.getElementById("gbText"),cnt=document.getElementById("gbCount"),send=document.getElementById("gbSend");
   function ok(){return GB_URL.indexOf("DEINE-DOMAIN")<0;}
