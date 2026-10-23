@@ -777,7 +777,7 @@ document.addEventListener("pointercancel",function(){ down=false; },{passive:tru
   size();
   lastNow=performance.now();
   requestAnimationFrame(frame);
-  function goFull(){
+  function goFull(){return; /* kein erzwungenes Vollbild mehr auf der Webseite */
     var d=document.documentElement,r=d.requestFullscreen||d.webkitRequestFullscreen;
     if(r&&!document.fullscreenElement&&!document.webkitFullscreenElement){try{var p=r.call(d,{navigationUI:"hide"});if(p&&p.catch)p.catch(function(){});}catch(err){}}
   }
@@ -845,6 +845,8 @@ var NEWS=[
 {d:"2026-10-15 02:10",t:"Neue Version v337",by:"c",x:"Beim Drücken aufs Logo fliegen die Blätter von der Schrift weg, kommen erst näher und werden beim Fallen wieder kleiner."},
 {d:"2026-10-15 02:13",t:"Neue Version v338",by:"c",x:"Blätter wirken räumlicher: Wegwehende Blätter kommen näher und werden größer, dann fallen sie zurück und werden kleiner. Alle Blätter kippen dreidimensional."},
 {d:"2026-10-15 02:17",t:"Neue Version v339",by:"c",x:"Herbst ist jetzt ein eigener Schalter: läuft als Extra-Animation über jedem Hintergrund, mit Anzeige on (grün) und off (rot)."},
+{d:"2026-10-23 23:58",t:"Neue Version v454",by:"c",x:"Fotos aus dem Gallery-Repository werden jetzt nacheinander geladen, damit alle ankommen."},
+{d:"2026-10-23 23:55",t:"Neue Version v453",by:"c",x:"Die Webseite erzwingt kein Vollbild mehr. Spiele öffnen sich weiterhin im Vollbild."},
 {d:"2026-10-23 23:14",t:"Neue Version v452",by:"c",x:"Neue Fotos aus dem Gallery-Repository erscheinen jetzt automatisch in der Gallery."},
 {d:"2026-10-23 23:10",t:"Neue Version v451",by:"c",x:"Vier neue Fotos aus dem Gallery-Repository sind in der Gallery, neueste zuerst."},
 {d:"2026-10-23 22:58",t:"Neue Version v450",by:"c",x:"Im Impressum ist am Anfang eine freie Zeile weniger."},
@@ -1225,6 +1227,13 @@ var NEWS=[
   }
   P23renderGal();
   var P23KNOWN=["20260928_150135.jpg","20261014_180134.jpg","20261023_174655.jpg","20261023_225130.jpg"];
+  function P23bmpShrink(bmp,max,q){var w=bmp.width,h=bmp.height,k=Math.min(1,max/Math.max(w,h));var c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);return c.toDataURL("image/jpeg",q/100);}
+  function P23one(t){
+    return fetch(t.url,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.blob();})
+      .then(function(bl){return createImageBitmap(bl);})
+      .then(function(bmp){var out={f:P23bmpShrink(bmp,1600,80),t:P23bmpShrink(bmp,400,78),d:t.d};try{bmp.close();}catch(e){}return out;})
+      .catch(function(){return null;});
+  }
   function P23loadRepo(){
     var base="https://raw.githubusercontent.com/gabriel-jauschowetz-hue/gallery/main/";
     fetch("https://api.github.com/repos/gabriel-jauschowetz-hue/gallery/contents",{cache:"no-store"}).then(function(r){return r.ok?r.json():[];}).then(function(list){
@@ -1235,15 +1244,10 @@ var NEWS=[
         if(!m||P23KNOWN.indexOf(x.name)>=0)return;
         todo.push({url:base+encodeURIComponent(x.name),d:m[1]+"-"+m[2]+"-"+m[3]+" "+m[4]+":"+m[5]});
       });
-      return Promise.all(todo.map(function(t){return new Promise(function(res){
-        var im=new Image();im.crossOrigin="anonymous";
-        im.onload=function(){try{res({f:shrinkImg(im,1600,80),t:shrinkImg(im,400,78),d:t.d});}catch(e){res(null);}};
-        im.onerror=function(){res(null);};
-        im.src=t.url;
-      });}));
+      // nacheinander laden, damit das Handy nicht mehrere große Fotos gleichzeitig dekodieren muss
+      return todo.reduce(function(p,t){return p.then(function(acc){return P23one(t).then(function(r){if(r)acc.push(r);return acc;});});},Promise.resolve([]));
     }).then(function(items){
-      items=(items||[]).filter(Boolean);
-      if(!items.length)return;
+      if(!items||!items.length)return;
       items.forEach(function(it){GAL.push(it);});
       P23renderGal();
     }).catch(function(){});
