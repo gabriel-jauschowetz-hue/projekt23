@@ -845,6 +845,9 @@ var NEWS=[
 {d:"2026-10-15 02:10",t:"Neue Version v337",by:"c",x:"Beim Drücken aufs Logo fliegen die Blätter von der Schrift weg, kommen erst näher und werden beim Fallen wieder kleiner."},
 {d:"2026-10-15 02:13",t:"Neue Version v338",by:"c",x:"Blätter wirken räumlicher: Wegwehende Blätter kommen näher und werden größer, dann fallen sie zurück und werden kleiner. Alle Blätter kippen dreidimensional."},
 {d:"2026-10-15 02:17",t:"Neue Version v339",by:"c",x:"Herbst ist jetzt ein eigener Schalter: läuft als Extra-Animation über jedem Hintergrund, mit Anzeige on (grün) und off (rot)."},
+{d:"2026-10-24 00:58",t:"Neue Version v465",by:"c",x:"Alle Bilder aus dem Gallery-Repository werden geladen, egal wie die Datei heißt."},
+{d:"2026-10-24 00:55",t:"Neue Version v464",by:"c",x:"Fotos aus dem Gallery-Repository werden zuverlässiger gefunden, auch wenn GitHub die Abfrage begrenzt."},
+{d:"2026-10-24 00:50",t:"Neue Version v463",by:"c",x:"Fotos aus dem Gallery-Repository erscheinen jetzt einzeln, sobald sie geladen sind."},
 {d:"2026-10-24 00:40",t:"Neue Version v462",by:"c",x:"Alte Fotos aus der Gallery entfernt. Es bleiben die Fotos aus dem Gallery-Repository."},
 {d:"2026-10-24 00:38",t:"Neue Version v461",by:"c",x:"Klick-Sound bei Buttons und Titellied wurden entfernt."},
 {d:"2026-10-24 00:36",t:"Neue Version v460",by:"c",x:"Das Titellied wird jetzt robuster geladen, damit es auf dem Handy abgespielt wird."},
@@ -1242,22 +1245,31 @@ var NEWS=[
       .then(function(bmp){var out={f:P23bmpShrink(bmp,1600,80),t:P23bmpShrink(bmp,400,78),d:t.d};try{bmp.close();}catch(e){}return out;})
       .catch(function(){return null;});
   }
+  // Dateiliste: zuerst GitHub-API, bei Fehlern (z. B. Abfragelimit) jsDelivr
+  function P23list(){
+    return fetch("https://api.github.com/repos/gabriel-jauschowetz-hue/gallery/contents",{cache:"no-store"})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(arr){return (arr||[]).map(function(x){return {name:x.name,file:x.type==="file"};});})
+      .catch(function(){
+        return fetch("https://data.jsdelivr.com/v1/packages/gh/gabriel-jauschowetz-hue/gallery@main?structure=flat",{cache:"no-store"})
+          .then(function(r){if(!r.ok)throw 0;return r.json();})
+          .then(function(o){return ((o&&o.files)||[]).map(function(f){return {name:String(f.name).replace(/^\//,""),file:true};});});
+      });
+  }
+  function P23nowStr(){var n=new Date(),p=function(v){return ("0"+v).slice(-2);};return n.getFullYear()+"-"+p(n.getMonth()+1)+"-"+p(n.getDate())+" "+p(n.getHours())+":"+p(n.getMinutes());}
   function P23loadRepo(){
     var base="https://raw.githubusercontent.com/gabriel-jauschowetz-hue/gallery/main/";
-    fetch("https://api.github.com/repos/gabriel-jauschowetz-hue/gallery/contents",{cache:"no-store"}).then(function(r){return r.ok?r.json():[];}).then(function(list){
+    P23list().then(function(list){
       var todo=[];
       (list||[]).forEach(function(x){
-        if(!x||x.type!=="file")return;
-        var m=/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})\d{2}\.(jpe?g|png)$/i.exec(x.name);
-        if(!m||P23KNOWN.indexOf(x.name)>=0)return;
-        todo.push({url:base+encodeURIComponent(x.name),d:m[1]+"-"+m[2]+"-"+m[3]+" "+m[4]+":"+m[5]});
+        if(!x||!x.file)return;
+        if(!/\.(jpe?g|png|webp|gif|bmp)$/i.test(x.name)||P23KNOWN.indexOf(x.name)>=0)return;
+        var m=/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/.exec(x.name);
+        var dd=m?(m[1]+"-"+m[2]+"-"+m[3]+" "+m[4]+":"+m[5]):P23nowStr();
+        todo.push({url:base+encodeURIComponent(x.name),d:dd});
       });
       // nacheinander laden, damit das Handy nicht mehrere große Fotos gleichzeitig dekodieren muss
-      return todo.reduce(function(p,t){return p.then(function(acc){return P23one(t).then(function(r){if(r)acc.push(r);return acc;});});},Promise.resolve([]));
-    }).then(function(items){
-      if(!items||!items.length)return;
-      items.forEach(function(it){GAL.push(it);});
-      P23renderGal();
+      return todo.reduce(function(p,t){return p.then(function(acc){return P23one(t).then(function(r){if(r){acc.push(r);GAL.push(r);P23renderGal();}return acc;});});},Promise.resolve([]));
     }).catch(function(){});
   }
   setTimeout(P23loadRepo,2500);
